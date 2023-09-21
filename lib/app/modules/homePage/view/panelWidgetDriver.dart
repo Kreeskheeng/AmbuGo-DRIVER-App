@@ -1,12 +1,9 @@
-// ignore_for_file: must_be_immutable, file_names
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:last_minute_driver/app/data/model/distance.dart';
-import 'package:last_minute_driver/app/data/model/repo_response.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:last_minute_driver/app/data/repo/distance_repo.dart';
-import 'package:last_minute_driver/helper/loading.dart';
 import 'package:last_minute_driver/helper/snackbar.dart';
 import 'package:last_minute_driver/utils/colors.dart';
 import '../../../../helper/shared_preference.dart';
@@ -14,175 +11,224 @@ import '../../../../utils/dimensions.dart';
 import '../../../../widgets/big_text.dart';
 import '../../../../widgets/button.dart';
 import '../controller/homePageDriverController.dart';
-import 'dart:math';
-
-
 
 class PanelWidgetDriver extends GetView<HomepageDriverController> {
-  DistanceRepository repo=DistanceRepository();
-  static const route='/panelWidget';
-  List<double> distance=[];
+  DistanceRepository repo = DistanceRepository();
+  static const route = '/panelWidget';
   var data = [];
-  PanelWidgetDriver({
-    super.key,
-  });
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(Dimensions.width15, Dimensions.height10,
-          Dimensions.width15, Dimensions.height30),
+      padding: EdgeInsets.fromLTRB(
+          Dimensions.width15, Dimensions.height10, Dimensions.width15, Dimensions.height30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         
           SizedBox(
             height: Dimensions.height30,
           ),
           Align(
-              alignment: Alignment.center,
-              child: BigText(
-                text: 'Emergency',
-                color: const Color(0xFFFF0000),
-                size: Dimensions.font26 * 1.4,
-              )),
+            alignment: Alignment.center,
+            child: BigText(
+              text: 'Emergency',
+              color: const Color(0xFFFF0000),
+              size: Dimensions.font26 * 1.4,
+            ),
+          ),
           SizedBox(
             height: Dimensions.height30,
           ),
-          Center(child: BigText(
-              text: 'Patient Located',
-            color: Colors.blueAccent,
-          )),
-
+          Center(child: BigText(text: 'Patient Located')),
           SizedBox(
             height: Dimensions.height20,
           ),
           StreamBuilder(
-            stream:
-                FirebaseFirestore.instance.collection('bookings').snapshots(),
+            stream: FirebaseFirestore.instance.collection('bookings').snapshots(),
             builder: ((context, snapshot) {
-              // locations.clear();
               data.clear();
               if (snapshot.hasData) {
                 final bookings = snapshot.data!.docs;
                 for (var booking in bookings) {
                   if (booking['ambulanceStatus'] == 'not assigned') {
                     data.add(booking);
-                    
                   }
                 }
               }
-              
-              
+
               return SizedBox(
                 height: Dimensions.height40 * 3,
                 child: ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          Row(
-                            children: [
-                              BigText(
-                                text: 'Patient Name: ',
-                                color: const Color(0xFFFF0000),
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final bookingData = data[index].data() as Map<String, dynamic>;
+                    final userName = bookingData['userName'];
+
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            BigText(
+                              text: 'PATIENT NAME: ',
+                              color: const Color(0xFFFF0000),
+                              size: Dimensions.font15,
+                            ),
+                            SizedBox(
+                              width: Dimensions.width15,
+                            ),
+                            Expanded(
+                              child: BigText(
+                                maxLines: null,
+                                text: userName,
                                 size: Dimensions.font15,
                               ),
-                              SizedBox(
-                                width: Dimensions.width15,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: Dimensions.height15,
+                        ),
+                        Row(
+                          children: [
+                            BigText(
+                              text: 'PREFERRED Hosp.: ',
+                              color: const Color(0xFFFF0000),
+                              size: Dimensions.font15,
+                            ),
+                            SizedBox(
+                              width: Dimensions.width15,
+                            ),
+                            Expanded(
+                              child: StreamBuilder<DocumentSnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('bookings')
+                                    .doc(data[index]['userId'])
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    final documentData =
+                                    snapshot.data!.data() as Map<String, dynamic>;
+                                    final additionalData =
+                                    documentData['additionalData'] as Map<String, dynamic>;
+                                    final preferredHospital =
+                                        additionalData['preferredHospital'] ??
+                                            'Preferred Hospital Not Set Yet!';
+
+                                    return BigText(
+                                      maxLines: null,
+                                      text: preferredHospital,
+                                      size: Dimensions.font15,
+                                    );
+                                  } else {
+                                    return Text(
+                                        'Loading...'); // Show loading indicator
+                                  }
+                                },
                               ),
-                              Expanded(
-                                child: BigText(
-                                  maxLines: null,
-                                  text: data[index]['userId'],
-                                  size: Dimensions.font15,
-                                ),
-                              )
+                            ),
+                          ],
+                        ),
 
-                            ],
+                        SizedBox(
+                          height: Dimensions.height15,
+                        ),
+                        Row(
+                          children: [
+                            BigText(
+                              text: 'OXYGEN NEED: ',
+                              color: const Color(0xFFFF0000),
+                              size: Dimensions.font15,
+                            ),
+                            SizedBox(
+                              width: Dimensions.width15,
+                            ),
+                            Expanded(
+                              child: StreamBuilder<DocumentSnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('bookings')
+                                    .doc(data[index]['userId'])
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    final documentData =
+                                    snapshot.data!.data() as Map<String, dynamic>;
+                                    final additionalData =
+                                    documentData['additionalData'] as Map<String, dynamic>;
+                                    final oxygenNeed =
+                                        additionalData['Is Oxygen neeeded'] ??
+                                            'Oxygen Need Not Set Yet!';
 
-                          ),
+                                    return BigText(
+                                      maxLines: null,
+                                      text: oxygenNeed,
+                                      size: Dimensions.font15,
+                                    );
+                                  } else {
+                                    return Text(
+                                        'Loading...'); // Show loading indicator
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
 
-                          SizedBox(
-                            height: Dimensions.height30,
-                          ),
-                        ],
-                      );
-                    }),
+                        // Additional Rows or Widgets can be added here for other data
+                      ],
+                    );
+                  },
+                ),
               );
             }),
           ),
           SizedBox(
             height: Dimensions.height20,
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Button(
                 on_pressed: () async {
-                  distance.clear();
                   if (data.isNotEmpty) {
-                    // LoadingUtils.showLoader();
-                    for (int i = 0; i < data.length; i++) {
-                      double lat = data[i]['location']['lat'];
-                      double lng = data[i]['location']['lng'];
-                      print('Calculating distance for index $i: lat=$lat, lng=$lng'); // Debug print
+                    double currentLat =
+                        controller.currentLocation?.latitude ?? 0.0;
+                    double currentLng =
+                        controller.currentLocation?.longitude ?? 0.0;
 
-                      RepoResponse<DistanceMatrix> response = await repo.getDistance(
-                        controller.currentLocation!.latitude!,
-                        controller.currentLocation!.longitude!,
-                        lat,
-                        lng,
-                      );
+                    List<double> distances = [];
+                    for (var booking in data) {
+                      double destinationLat = booking['location']['lat'];
+                      double destinationLng = booking['location']['lng'];
 
-                      if (response.data != null &&
-                          response.data!.rows != null &&
-                          response.data!.rows!.isNotEmpty &&
-                          response.data!.rows![0].elements != null &&
-                          response.data!.rows![0].elements!.isNotEmpty &&
-                          response.data!.rows![0].elements![0].distance != null &&
-                          response.data!.rows![0].elements![0].distance!.text != null) {
-                        String dist = response.data!.rows![0].elements![0].distance!.text!;
-                        print('Distance text for index $i: $dist'); // Debug print
-                        double distances = double.tryParse(dist.substring(0, dist.indexOf(' '))) ?? 0.0;
-                        print('Distance calculated for index $i: $distances'); // Debug print
-                        distance.add(distances);
-
-                        // Rest of your loop code...
-                      }
+                      double dist = Geolocator.distanceBetween(
+                          currentLat, currentLng, destinationLat, destinationLng);
+                      distances.add(dist);
                     }
 
-                    print('Finished distance calculation loop.'); // Debug print
-                    print('Distances: $distance'); // Debug print
+                    if (distances.isNotEmpty) {
+                      int smallestIndex =
+                      distances.indexOf(distances.reduce(min));
+                      String bookedPatient = data[smallestIndex]['userId'];
 
-                    if (distance.isNotEmpty) {
-                      print('Calculating smallest index...'); // Debug print
-                      int smallestIndex = distance.indexOf(distance.reduce(min));
-                      print('Smallest distance index: $smallestIndex'); // Debug print
-                      if (smallestIndex >= 0 && smallestIndex < data.length) {
-                        String bookedPatient = data[smallestIndex]['userId'];
-                        print('Booked patient: $bookedPatient'); // Debug print
+                      FirebaseFirestore.instance
+                          .collection('bookings')
+                          .doc(bookedPatient)
+                          .update({
+                        'ambulanceDetails': {
+                          'driverId': SPController().getUserId(),
+                        },
+                        'ambulanceStatus': 'assigned',
+                        'rideKey': SPController()
+                            .getUserId()
+                            .toString()
+                            .substring(0, 6),
+                      });
 
-                        FirebaseFirestore.instance.collection('bookings').doc(bookedPatient).update({
-                          'ambulanceDetails': {
-                            'driverId': SPController().getUserId(),
-                          },
-                          'ambulanceStatus': 'assigned',
-                          'rideKey': SPController().getUserId().toString().substring(0, 6),
-                        });
-
-                        // LoadingUtils.hideLoader();
-                        controller.onAmbulanceBooked(true, bookedPatient);
-                      } else {
-                        // LoadingUtils.hideLoader();
-                        snackbar('Invalid index or no valid patient found!');
-                      }
+                      controller.onAmbulanceBooked(true, bookedPatient);
                     } else {
-                      // LoadingUtils.hideLoader();
-                      snackbar('No valid distances found!');
+                      snackbar('No suitable bookings to accept!');
                     }
                   } else {
-                    // LoadingUtils.hideLoader();
                     snackbar('Nothing to accept!');
                   }
                 },
@@ -193,30 +239,27 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                 height: Dimensions.height40 * 1.2,
                 color: AppColors.pink,
               ),
-
-
               Button(
-               on_pressed: () {
-                  if(data.isNotEmpty){
-                    FirebaseFirestore.instance.collection('bookings').doc(data[0]['userId']).update({
-                      'ambulanceDetails':{
-                        'driverId':SPController().getUserId(),
-                       
-                      },
-                      'ambulanceStatus':'assigned'
+                on_pressed: () {
+                  if (data.isNotEmpty) {
+                    FirebaseFirestore.instance
+                        .collection('bookings')
+                        .doc(data[0]['userId'])
+                        .update({
+                      'ambulanceDetails': {'driverId': SPController().getUserId()},
+                      'ambulanceStatus': 'assigned',
                     });
                   }
-                  controller.onAmbulanceBooked(false, '');
-               },
-               text: 'Decline',
-               textColor: AppColors.pink,
-               radius: Dimensions.radius20 * 2,
-               width: Dimensions.width40 * 4,
-               height: Dimensions.height40*1.2,
-               color: AppColors.white,
-               boxBorder: Border.all(width: 2, color: AppColors.pink),
-                    ),
-         
+                  controller.onAmbulanceBooked(true, '');
+                },
+                text: 'Decline',
+                textColor: AppColors.pink,
+                radius: Dimensions.radius20 * 2,
+                width: Dimensions.width40 * 4,
+                height: Dimensions.height40 * 1.2,
+                color: AppColors.white,
+                boxBorder: Border.all(width: 2, color: AppColors.pink),
+              ),
             ],
           ),
         ],

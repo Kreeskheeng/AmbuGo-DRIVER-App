@@ -1,4 +1,3 @@
-// ignore_for_file: file_names
 
 import 'dart:async';
 import 'dart:developer';
@@ -6,20 +5,21 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:location/location.dart';
 class HomepageStaffController extends GetxController {
-  RxBool isLoading = true.obs;
-  Location location = Location();
-  LatLng? currentLocation;
+  RxBool isLoading = false.obs;
+  Geolocator geolocator = Geolocator();
+  Position? currentLocation;
   late bool _serviceEnabled;
   late StreamController<LatLng> latLng = StreamController();
+
   //location
   TextEditingController enterLocation = TextEditingController();
   final selectedAddress =
-      'Nehru Colony, Something Something, SomeCity, India'.obs;
+      'kampala city, Something Something, SomeCity, '.obs;
   onChangedselectedAddress(String addressLocation) {
     selectedAddress(addressLocation);
   }
@@ -47,33 +47,47 @@ class HomepageStaffController extends GetxController {
     }
     
   }
- 
+
   @override
   void onInit() {
-    getpermission();
+    getPermission();
     getCurrentLocation();
     super.onInit();
   }
 
   void getCurrentLocation() async {
-    Location location = Location();
-    location.getLocation().then(
-      (location) {
-        currentLocation = (LatLng(location.latitude!, location.longitude!));
-        latLng.add(currentLocation!);
-        log("Got Current Location");
-        isLoading.value = false;
-      },
-    );
+    try {
+      currentLocation = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Update ambulance's location in Firestore
+      await FirebaseFirestore.instance.collection('ambulances').doc('ambulanceLocation').update({
+        'latitude': currentLocation!.latitude,
+        'longitude': currentLocation!.longitude,
+      });
+
+      log("Got Current Location");
+      isLoading.value = false;
+    } catch (e) {
+      log("Error getting current location: $e");
+    }
   }
 
-  void getpermission() async {
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
+  void getPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
         debugPrint('Location Denied once');
       }
+    }
+
+    _serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!_serviceEnabled) {
+      debugPrint('Location services are disabled');
     }
   }
 
@@ -82,7 +96,7 @@ class HomepageStaffController extends GetxController {
     polylineCoordinates.clear();
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        'AIzaSyCAYnuFO2kwBTN2qpa22yV51fglehTdnP8',
+        'AIzaSyBu60-4S559TmDx6ky9KTJ5Pl2VD0qQ4O8',
         PointLatLng(
             patientLocation.latitude, patientLocation.longitude),
         PointLatLng(driverLocation.latitude, driverLocation.longitude));
@@ -95,24 +109,23 @@ class HomepageStaffController extends GetxController {
     }
   }
 
+
+
+
   final _patientLocation = const LatLng(0, 0).obs;
   LatLng get patientLocation => _patientLocation.value;
   final _driverLocation = const LatLng(0, 0).obs;
   LatLng get driverLocation => _driverLocation.value;
-  
+
   final _time=''.obs;
   String get time=>_time.value;
 
-  onGetPatientLocation(double patientLat,double patientLng,double driverLat,double driverLng,String estimatedTime){
-    
-    _patientLocation(LatLng(patientLat,
-        patientLng));
-        //_time(estimatedTime);
-        _driverLocation(LatLng(driverLat, driverLng));
-        //_bookedPatientId(userId);
+  onGetPatientLocation(double patientLat, double patientLng, double driverLat, double driverLng, String estimatedTime) {
+    _patientLocation(LatLng(patientLat, patientLng));
+    _driverLocation(LatLng(driverLat, driverLng));
+    _time(estimatedTime);
     getPolyPoints();
-    //onUpdateLocationFirebase();
+    // onUpdateLocationFirebase();
   }
 
-  
 }

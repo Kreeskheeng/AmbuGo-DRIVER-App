@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:last_minute_driver/app/modules/homePage/view/homePageDriver.dart';
 
 import '../../../../utils/colors.dart';
 import '../../../../utils/dimensions.dart';
@@ -12,6 +11,54 @@ import '../../../../widgets/drop_down.dart';
 import '../../../../widgets/text_field.dart';
 import '../controller/createProfileDriverController.dart';
 
+class TransparentAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final VoidCallback onNotificationPressed;
+  final VoidCallback onLogoutPressed;
+
+  TransparentAppBar({
+    required this.title,
+    required this.onNotificationPressed,
+    required this.onLogoutPressed,
+
+
+  });
+
+  @override
+  Size get preferredSize => Size.fromHeight(56.0);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      title: Row(
+        children: [
+          Image.asset(
+            'assets/images/ambugo.jpg', // Update with your logo image path
+            width: 45,
+            height: 45,
+          ),
+          SizedBox(width: 2.0), // Add some spacing between logo and text
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.pink,
+              fontFamily: 'RedHat',
+              fontWeight: FontWeight.bold,
+              fontSize: 27.6,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+
+      ],
+    );
+
+  }
+}
+
 class CreateProfileDriver extends GetView<CreateProfileDriverController> {
   static const route = '/createprofile-driver';
   static launch() => Get.toNamed(route);
@@ -20,6 +67,16 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: TransparentAppBar(
+        title: "AmbuLance Go",
+        onNotificationPressed: () {
+          // TODO: Handle notification button press
+          // Implement your notification logic here
+        },
+        onLogoutPressed: () {
+
+        },
+      ),
       body: SizedBox(
         width: Dimensions.screenWidth,
         height: Dimensions.screenHeight,
@@ -51,7 +108,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                             border: InputBorder.none,
                             prefixIcon: Icon(
                               Icons.person,
-                              color: AppColors.pink,
+                              color: Colors.indigo,
                             ),
                             hintText: 'Name',
                           ),
@@ -71,7 +128,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                               border: InputBorder.none,
                               prefixIcon: Icon(
                                 Icons.phone,
-                                color: AppColors.pink,
+                                color: Colors.indigo,
                               ),
                               hintText: 'Mobile No.',
                             ),
@@ -93,7 +150,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                                 border: InputBorder.none,
                                 prefixIcon: Icon(
                                   Icons.location_city,
-                                  color: AppColors.pink,
+                                  color: Colors.indigo,
                                 ),
                                 hintText: 'Address',
                               ),
@@ -132,7 +189,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                                 border: InputBorder.none,
                                 prefixIcon: Icon(
                                   Icons.bloodtype,
-                                  color: AppColors.pink,
+                                  color: Colors.indigo,
                                 ),
                                 hintText: 'Blood Group',
                               ),
@@ -152,7 +209,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                             border: InputBorder.none,
                             prefixIcon: Icon(
                               Icons.car_rental,
-                              color: AppColors.pink,
+                              color: Colors.indigo,
                             ),
                             hintText: 'Driving Licence',
                           ),
@@ -170,7 +227,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                             border: InputBorder.none,
                             prefixIcon: Icon(
                               Icons.car_rental,
-                              color: AppColors.pink,
+                              color: Colors.indigo,
                             ),
                             hintText: 'Car Licence Plate',
                           ),

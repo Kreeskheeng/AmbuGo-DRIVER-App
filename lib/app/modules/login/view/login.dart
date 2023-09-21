@@ -184,7 +184,7 @@ class LogIn extends StatelessWidget {
                                     border: InputBorder.none,
                                     prefixIcon: Icon(
                                       Icons.phone,
-                                      color: AppColors.pink,
+                                      color: Colors.indigo,
                                     ),
                                     hintText: 'Mobile Number',
                                   ),

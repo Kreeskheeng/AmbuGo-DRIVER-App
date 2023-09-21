@@ -8,7 +8,6 @@ import '../../../../utils/colors.dart';
 import '../../../../utils/dimensions.dart';
 import '../../../../widgets/big_text.dart';
 import '../../../../widgets/button.dart';
-import '../controller/homePageDriverController.dart';
 import '../controller/homePageStaffController.dart';
 
 
@@ -41,7 +40,7 @@ class PanelWidgetStaff extends GetView<HomepageStaffController> {
         
          
           
-          Center(child: BigText(text: 'Enter Driver\'s ID', fontWeight: FontWeight.bold,)),
+          Center(child: BigText(text: 'Enter Ride Key', fontWeight: FontWeight.bold,)),
 
           
 SizedBox(
@@ -55,7 +54,7 @@ SizedBox(
           controller: Ikey,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: Dimensions.width30, vertical: Dimensions.height15),
-            hintText: "",
+            hintText: "First five characters of UserID",
             suffixIcon: Material(
               elevation: Dimensions.height10/2,
               borderRadius: BorderRadius.circular(Dimensions.radius30),
