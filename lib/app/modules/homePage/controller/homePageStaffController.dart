@@ -10,9 +10,9 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomepageStaffController extends GetxController {
-  RxBool isLoading = false.obs;
+  RxBool isLoading = true.obs;
   Geolocator geolocator = Geolocator();
-  Position? currentLocation;
+  late Position? currentLocation;
   late bool _serviceEnabled;
   late StreamController<LatLng> latLng = StreamController();
 

@@ -50,7 +50,11 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
               if (snapshot.hasData) {
                 final bookings = snapshot.data!.docs;
                 for (var booking in bookings) {
-                  if (booking['ambulanceStatus'] == 'not assigned') {
+                  final bookingData = booking.data() as Map<String, dynamic>;
+                  final declinedDrivers = bookingData['declinedDrivers'] ?? [];
+
+                  // Check if the current driver has already declined the request
+                  if (!declinedDrivers.contains(SPController().getUserId())) {
                     data.add(booking);
                   }
                 }
@@ -63,6 +67,7 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                   itemBuilder: (context, index) {
                     final bookingData = data[index].data() as Map<String, dynamic>;
                     final userName = bookingData['userName'];
+                    final userId = data[index].id;
 
                     return Column(
                       children: [
@@ -102,7 +107,7 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                               child: StreamBuilder<DocumentSnapshot>(
                                 stream: FirebaseFirestore.instance
                                     .collection('bookings')
-                                    .doc(data[index]['userId'])
+                                    .doc(userId)
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
@@ -146,7 +151,7 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                               child: StreamBuilder<DocumentSnapshot>(
                                 stream: FirebaseFirestore.instance
                                     .collection('bookings')
-                                    .doc(data[index]['userId'])
+                                    .doc(userId)
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
@@ -173,7 +178,77 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                           ],
                         ),
 
-                        // Additional Rows or Widgets can be added here for other data
+                        SizedBox(
+                          height: Dimensions.height15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Button(
+                              on_pressed: () async {
+                                double currentLat =
+                                    controller.currentLocation?.latitude ?? 0.0;
+                                double currentLng =
+                                    controller.currentLocation?.longitude ?? 0.0;
+
+                                double destinationLat = data[index]['location']['lat'];
+                                double destinationLng = data[index]['location']['lng'];
+
+                                double dist = Geolocator.distanceBetween(
+                                    currentLat, currentLng, destinationLat, destinationLng);
+
+                                String bookedPatient = userId;
+
+                                FirebaseFirestore.instance
+                                    .collection('bookings')
+                                    .doc(bookedPatient)
+                                    .update({
+                                  'ambulanceDetails': {
+                                    'driverId': SPController().getUserId(),
+                                  },
+                                  // Instead of changing ambulanceStatus, add the current driver to declinedDrivers list
+                                  'declinedDrivers': FieldValue.arrayUnion([SPController().getUserId()]),
+                                  'rideKey': SPController()
+                                      .getUserId()
+                                      .toString()
+                                      .substring(0, 6),
+                                });
+
+                                controller.onAmbulanceBooked(true, bookedPatient);
+                              },
+                              text: 'Accept',
+                              textColor: AppColors.white,
+                              radius: Dimensions.radius20 * 2,
+                              width: Dimensions.width40 * 2,
+                              height: Dimensions.height40 * 1.2,
+                              color: AppColors.pink,
+                            ),
+                            Button(
+                              on_pressed: () {
+                                // No need to update ambulanceStatus here
+                                // Instead, add the current driver to declinedDrivers list
+                                FirebaseFirestore.instance
+                                    .collection('bookings')
+                                    .doc(userId)
+                                    .update({
+                                  'declinedDrivers': FieldValue.arrayUnion([SPController().getUserId()]),
+                                });
+                                controller.onAmbulanceBooked(true, '');
+                              },
+                              text: 'Decline',
+                              textColor: AppColors.pink,
+                              radius: Dimensions.radius20 * 2,
+                              width: Dimensions.width40 * 2,
+                              height: Dimensions.height40 * 1.2,
+                              color: AppColors.white,
+                              boxBorder: Border.all(width: 2, color: AppColors.pink),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(
+                          height: Dimensions.height15,
+                        ),
                       ],
                     );
                   },
@@ -183,84 +258,6 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
           ),
           SizedBox(
             height: Dimensions.height20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Button(
-                on_pressed: () async {
-                  if (data.isNotEmpty) {
-                    double currentLat =
-                        controller.currentLocation?.latitude ?? 0.0;
-                    double currentLng =
-                        controller.currentLocation?.longitude ?? 0.0;
-
-                    List<double> distances = [];
-                    for (var booking in data) {
-                      double destinationLat = booking['location']['lat'];
-                      double destinationLng = booking['location']['lng'];
-
-                      double dist = Geolocator.distanceBetween(
-                          currentLat, currentLng, destinationLat, destinationLng);
-                      distances.add(dist);
-                    }
-
-                    if (distances.isNotEmpty) {
-                      int smallestIndex =
-                      distances.indexOf(distances.reduce(min));
-                      String bookedPatient = data[smallestIndex]['userId'];
-
-                      FirebaseFirestore.instance
-                          .collection('bookings')
-                          .doc(bookedPatient)
-                          .update({
-                        'ambulanceDetails': {
-                          'driverId': SPController().getUserId(),
-                        },
-                        'ambulanceStatus': 'assigned',
-                        'rideKey': SPController()
-                            .getUserId()
-                            .toString()
-                            .substring(0, 6),
-                      });
-
-                      controller.onAmbulanceBooked(true, bookedPatient);
-                    } else {
-                      snackbar('No suitable bookings to accept!');
-                    }
-                  } else {
-                    snackbar('Nothing to accept!');
-                  }
-                },
-                text: 'Accept',
-                textColor: AppColors.white,
-                radius: Dimensions.radius20 * 2,
-                width: Dimensions.width40 * 4,
-                height: Dimensions.height40 * 1.2,
-                color: AppColors.pink,
-              ),
-              Button(
-                on_pressed: () {
-                  if (data.isNotEmpty) {
-                    FirebaseFirestore.instance
-                        .collection('bookings')
-                        .doc(data[0]['userId'])
-                        .update({
-                      'ambulanceDetails': {'driverId': SPController().getUserId()},
-                      'ambulanceStatus': 'assigned',
-                    });
-                  }
-                  controller.onAmbulanceBooked(true, '');
-                },
-                text: 'Decline',
-                textColor: AppColors.pink,
-                radius: Dimensions.radius20 * 2,
-                width: Dimensions.width40 * 4,
-                height: Dimensions.height40 * 1.2,
-                color: AppColors.white,
-                boxBorder: Border.all(width: 2, color: AppColors.pink),
-              ),
-            ],
           ),
         ],
       ),

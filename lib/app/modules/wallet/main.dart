@@ -341,17 +341,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
                               onPressed: () {
                                 _onServiceButtonPressed(_services[index][0]);
                               },
-                              style: ElevatedButton.styleFrom(
-                                primary: _services[index][2],
-                                // Base color
-                                onPrimary: _services[index][3],
-                                // Light shadow color
-                                elevation: 8,
-                                // Adjust elevation value for the depth of the neumorphism effect
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
+
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -527,12 +517,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
           onPressed: () {
             _onServiceButtonPressed(service[0]);
           },
-          style: ElevatedButton.styleFrom(
-            primary: service[2],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
+
           child: Column(
             children: [
               Container(

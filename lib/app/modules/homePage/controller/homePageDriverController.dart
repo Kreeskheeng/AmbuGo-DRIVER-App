@@ -15,20 +15,21 @@ import 'package:last_minute_driver/app/data/repo/distance_repo.dart';
 class HomepageDriverController extends GetxController {
   Completer<GoogleMapController> mapControl = Completer();
   Geolocator geolocator = Geolocator();
-  Position? currentLocation;
+
+  //late Position? currentLocation;
   late bool _serviceEnabled;
   DistanceRepository repo = DistanceRepository();
 
-  //late Position currentLocation = Position(
-   // latitude: 0.334873, // Default latitude
-   // longitude: 32.567497, // Default longitude
-   // timestamp: DateTime.now(), // Default timestamp
-   // accuracy: 0.0, // Default accuracy
-   // altitude: 0.0, // Default altitude
-    //heading: 0.0, // Default heading
-    //speed: 0.0, // Default speed
-   // speedAccuracy: 0.0, // Default speed accuracy
-  //);
+  late Position currentLocation = Position(
+    latitude: 0.334873, // Default latitude
+    longitude: 32.567497, // Default longitude
+    timestamp: DateTime.now(), // Default timestamp
+    accuracy: 0.0, // Default accuracy
+    altitude: 0.0, // Default altitude
+    heading: 0.0, // Default heading
+    speed: 0.0, // Default speed
+    speedAccuracy: 0.0, // Default speed accuracy
+  );
 
 
 
@@ -43,19 +44,19 @@ class HomepageDriverController extends GetxController {
 
 
   //Future<void> initCurrentLocation() async {
-  //  try {
-  //    LocationPermission permission = await Geolocator.requestPermission();
-   //   if (permission == LocationPermission.denied ||
-   //       permission == LocationPermission.deniedForever) {
-        // Handle permission denied cases
-    //    return;
-    //  }
+   // try {
+   //   LocationPermission permission = await Geolocator.requestPermission();
+     // if (permission == LocationPermission.denied ||
+       //   permission == LocationPermission.deniedForever) {
+         //Handle permission denied cases
+       // return;
+     // }
 
-    //  Position position = await Geolocator.getCurrentPosition();
-    // currentLocation = position; // Update the currentLocation here
-   // } catch (e) {
-   //   isLoading.value = false;
-      // Handle exceptions
+      //Position position = await Geolocator.getCurrentPosition();
+     //currentLocation = position; // Update the currentLocation here
+    //} catch (e) {
+     // isLoading.value = false;
+       //Handle exceptions
    // }
   //}
 
