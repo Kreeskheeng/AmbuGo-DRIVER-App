@@ -10,11 +10,23 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomepageStaffController extends GetxController {
-  RxBool isLoading = true.obs;
+  RxBool isLoading = false.obs;
   Geolocator geolocator = Geolocator();
-  late Position? currentLocation;
+  //late Position currentLocation;
   late bool _serviceEnabled;
   late StreamController<LatLng> latLng = StreamController();
+
+  late Position currentLocation = Position(
+    latitude: 0.334873, // Default latitude
+    longitude: 32.567497, // Default longitude
+    timestamp: DateTime.now(), // Default timestamp
+    accuracy: 0.0, // Default accuracy
+    altitude: 0.0, // Default altitude
+    heading: 0.0, // Default heading
+    speed: 0.0, // Default speed
+    speedAccuracy: 0.0, // Default speed accuracy
+  );
+
 
   //location
   TextEditingController enterLocation = TextEditingController();
