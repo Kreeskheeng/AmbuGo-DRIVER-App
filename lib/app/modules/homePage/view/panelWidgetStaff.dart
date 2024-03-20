@@ -29,7 +29,7 @@ class PanelWidgetStaff extends GetView<HomepageStaffController> {
         children: [
           Container(
                     width: Dimensions.width20 * 4,
-                    height: Dimensions.height10 / 5,
+                    height: Dimensions.height10,
                     decoration: BoxDecoration(
                         color: AppColors.lightGrey,
                         borderRadius: BorderRadius.circular(20)),
@@ -106,7 +106,7 @@ SizedBox(
                   text: 'Enter',
                   radius: Dimensions.radius20 * 2,
                   width: Dimensions.width40 * 6,
-                  height: Dimensions.height40*1.5,
+                  height: Dimensions.height40*1,
                   color: Color(0xFF589D4C),
                 )
               
