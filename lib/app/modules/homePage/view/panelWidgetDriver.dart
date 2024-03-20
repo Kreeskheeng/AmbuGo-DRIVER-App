@@ -186,40 +186,53 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                           children: [
                             Button(
                               on_pressed: () async {
-                                double currentLat =
-                                    controller.currentLocation?.latitude ?? 0.0;
-                                double currentLng =
-                                    controller.currentLocation?.longitude ?? 0.0;
+                                if (data.isNotEmpty) {
+                                  double currentLat =
+                                      controller.currentLocation?.latitude ?? 0.0;
+                                  double currentLng =
+                                      controller.currentLocation?.longitude ?? 0.0;
 
-                                double destinationLat = data[index]['location']['lat'];
-                                double destinationLng = data[index]['location']['lng'];
+                                  List<double> distances = [];
+                                  for (var booking in data) {
+                                    double destinationLat = booking['location']['lat'];
+                                    double destinationLng = booking['location']['lng'];
 
-                                double dist = Geolocator.distanceBetween(
-                                    currentLat, currentLng, destinationLat, destinationLng);
+                                    double dist = Geolocator.distanceBetween(
+                                        currentLat, currentLng, destinationLat, destinationLng);
+                                    distances.add(dist);
+                                  }
 
-                                String bookedPatient = userId;
+                                  if (distances.isNotEmpty) {
+                                    int smallestIndex =
+                                    distances.indexOf(distances.reduce(min));
+                                    String bookedPatient = data[smallestIndex]['userId'];
 
-                                FirebaseFirestore.instance
-                                    .collection('bookings')
-                                    .doc(bookedPatient)
-                                    .update({
-                                  'ambulanceDetails': {
-                                    'driverId': SPController().getUserId(),
-                                  },
-                                  // Instead of changing ambulanceStatus, add the current driver to declinedDrivers list
-                                  'declinedDrivers': FieldValue.arrayUnion([SPController().getUserId()]),
-                                  'rideKey': SPController()
-                                      .getUserId()
-                                      .toString()
-                                      .substring(0, 6),
-                                });
+                                    FirebaseFirestore.instance
+                                        .collection('bookings')
+                                        .doc(bookedPatient)
+                                        .update({
+                                      'ambulanceDetails': {
+                                        'driverId': SPController().getUserId(),
+                                      },
+                                      'ambulanceStatus': 'assigned',
+                                      'rideKey': SPController()
+                                          .getUserId()
+                                          .toString()
+                                          .substring(0, 6),
+                                    });
 
-                                controller.onAmbulanceBooked(true, bookedPatient);
+                                    controller.onAmbulanceBooked(true, bookedPatient);
+                                  } else {
+                                    snackbar('No suitable bookings to accept!');
+                                  }
+                                } else {
+                                  snackbar('Nothing to accept!');
+                                }
                               },
                               text: 'Accept',
                               textColor: AppColors.white,
                               radius: Dimensions.radius20 * 2,
-                              width: Dimensions.width40 * 2,
+                              width: Dimensions.width40 * 4,
                               height: Dimensions.height40 * 1.2,
                               color: AppColors.pink,
                             ),
