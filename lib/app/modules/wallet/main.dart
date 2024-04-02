@@ -6,7 +6,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart'; // Add Firebase Core package
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:last_minute_driver/app/modules/wallet/pages/Qr.dart'; // Add Cloud Firestore package
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 
@@ -502,8 +501,6 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
       }
 
       if (serviceName == 'billx') {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyCustomWidget()));
       }
     }
 

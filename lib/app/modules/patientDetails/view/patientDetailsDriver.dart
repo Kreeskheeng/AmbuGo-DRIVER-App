@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
+import 'package:last_minute_driver/app/modules/qr/HomePage.dart';
+import 'package:last_minute_driver/app/modules/qr/QR%20Generator/QRGenerator.dart';
 import 'package:last_minute_driver/widgets/button.dart';
 import '../../../../helper/shared_preference.dart';
 import '../../../../utils/colors.dart';
@@ -92,11 +94,11 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                             children: [
                               Row(
                                 children: [
-                                  // Icon(
-                                  //   Icons.phone,
-                                  //   color: Colors.black, // Customize the color as needed
-                                  //   size: Dimensions.font15 * 1.2,
-                                  //  ),
+                                   //Icon(
+                                    // Icons.phone,
+                                    // color: Colors.black, // Customize the color as needed
+                                    // size: Dimensions.font15 * 1.2,
+                                   // ),
                                   SizedBox(width: Dimensions.width5), // Add some spacing between the icon and the text
                                   BigText(
                                     text: 'Phone number:  ',
@@ -357,11 +359,30 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                   ),
 
 
+
+
                   const Divider(
                     thickness: 1,
                     color: AppColors.lightGrey,
                     height: 30,
                   ),
+
+                  Button(
+                    on_pressed: ()  {Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => QRGenerator(),
+                    ));},
+                    height: Dimensions.height40 * 1.4,
+                    width: Dimensions.width40 * 5,
+                    text: "Generate QrCode.",
+                    textColor: AppColors.pink,
+                    boxBorder: Border.all(width: 2, color: AppColors.pink),
+                    color: Colors.transparent,
+                    radius: Dimensions.radius30,
+                  ),
+
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -67,7 +67,7 @@ class PatientDetailsStaff extends StatelessWidget {
                         SizedBox(height: Dimensions.height20 * 1.5),
                         Button(
                           on_pressed: () {},
-                          text: 'Estimated Arrival: ${patientDocument['ambulanceLocation']?['time'] ?? 'N/A'}',
+                          text: 'Estimated Arrival: ${patientDocument['ambulanceLocation']?['time'] ?? '5 minutes'}',
                           color: AppColors.black,
                           textColor: AppColors.white,
                           width: Dimensions.width40 * 6,
@@ -89,7 +89,7 @@ class PatientDetailsStaff extends StatelessWidget {
                               )
                             ],
                           ),
-                          SizedBox(height: Dimensions.height15),
+                          SizedBox(height: Dimensions.height10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -120,8 +120,9 @@ class PatientDetailsStaff extends StatelessWidget {
                           const Divider(
                             thickness: 1,
                             color: AppColors.lightGrey,
-                            height: 40,
+                            height: 20,
                           ),
+
                         ],
                         // Rest of your UI code...
                       ],
@@ -136,7 +137,7 @@ class PatientDetailsStaff extends StatelessWidget {
               MedicalReport.launch();
             },
             text: 'Create Medical Report',
-            height: Dimensions.height40 * 1.3,
+            height: Dimensions.height40 * 1.7,
             color: AppColors.pink,
             textColor: Colors.white,
           ),

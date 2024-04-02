@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:last_minute_driver/app/modules/homePage/view/panelWidgetDriver.dart';
 import 'package:last_minute_driver/app/modules/logIn/view/login.dart';
+import 'package:last_minute_driver/app/modules/qr/HomePage.dart';
 import 'package:last_minute_driver/helper/shared_preference.dart';
 import 'package:last_minute_driver/helper/snackbar.dart';
 import 'package:last_minute_driver/widgets/big_text.dart';
@@ -61,7 +62,8 @@ class TransparentAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           icon: Icon(Icons.notifications, color: Colors.indigo),
-          onPressed: onNotificationPressed,
+          onPressed: () {
+            QrPage();},
         ),
         IconButton(
           icon: Icon(Icons.logout, color: Colors.indigo),
@@ -80,6 +82,7 @@ class HomepageDriver extends GetView<HomepageDriverController> {
   static const route = '/homepage-driver';
   bool patientAssign = false;
   String patient = '';
+  
 
   HomepageDriver
 
