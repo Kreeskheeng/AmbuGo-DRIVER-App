@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:last_minute_driver/app/modules/after_login/view/after_login.dart';
 import 'package:last_minute_driver/app/modules/homePage/view/panelWidgetDriver.dart';
@@ -56,6 +57,11 @@ class AppRoutes {
       name: LoginAsPage.route,
       page: () => LoginAsPage(),
     ),
-    GetPage(name: PanelWidgetDriver.route, page: (() => PanelWidgetDriver()),binding: HomepageDriverBinding()) 
+    GetPage(
+      name: PanelWidgetDriver.route,
+      page: () => PanelWidgetDriver(scrollController: ScrollController()),
+      binding: HomepageDriverBinding(),
+    )
+
   ];
 }
