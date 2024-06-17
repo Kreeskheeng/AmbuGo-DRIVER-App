@@ -56,14 +56,16 @@ class PanelWidgetDriver extends GetView<HomepageDriverController> {
                   final bookings = snapshot.data!.docs;
                   for (var booking in bookings) {
                     final bookingData = booking.data() as Map<String, dynamic>;
+                    final ambulanceStatus = bookingData['ambulanceStatus'];
                     final declinedDrivers = bookingData['declinedDrivers'] ?? [];
 
-                    // Check if the current driver has already declined the request
-                    if (!declinedDrivers.contains(SPController().getUserId())) {
+                    // Combine conditions
+                    if (ambulanceStatus == 'not assigned' && !declinedDrivers.contains(SPController().getUserId())) {
                       data.add(booking);
                     }
                   }
                 }
+
 
                 return Column(
                   children: data.map<Widget>((booking) {

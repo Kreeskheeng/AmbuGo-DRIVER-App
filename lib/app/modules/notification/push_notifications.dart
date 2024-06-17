@@ -61,14 +61,21 @@ class PushNotification {
     );
   }
 
-  Future<void> _handleNotificationData(Map<String, dynamic> data) async {
+  void _handleNotificationData(Map<String, dynamic> data) async {
     // Handle your notification data here
     print("Notification data: $data");
+    // Example: Parse the data and take appropriate actions based on the notification content
+    if (data.containsKey('title') && data.containsKey('body')) {
+      String title = data['title'];
+      String body = data['body'];
+      // Example: Show notification to user or navigate to a specific screen based on the notification
+      print('Received notification - Title: $title, Body: $body');
+    }
   }
-}
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Handle background messages
-  print("Background message: ${message.data}");
-  PushNotification()._handleNotificationData(message.data);
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    // Handle background messages
+    print("Background message: ${message.data}");
+    _handleNotificationData(message.data);
+  }
 }
