@@ -1,6 +1,7 @@
 import 'dart:async';
 
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -10,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:last_minute_driver/app/data/repo/distance_repo.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 class HomepageDriverController extends GetxController {
@@ -304,4 +306,41 @@ class HomepageDriverController extends GetxController {
     _time.value = estimatedTime.toString();
   }
 
+
+
+}
+
+
+class CustomShimmer extends StatelessWidget {
+  final double width;
+  final double height;
+  final ShapeBorder shapeBorder;
+
+  const CustomShimmer.rectangular({
+    Key? key,
+    this.width = double.infinity,
+    required this.height,
+  }) : shapeBorder = const RoundedRectangleBorder(),
+        super(key: key);
+
+  const CustomShimmer.circular({
+    Key? key,
+    required this.width,
+    required this.height,
+  }) : shapeBorder = const CircleBorder(),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: Container(
+      width: width,
+      height: height,
+      decoration: ShapeDecoration(
+        color: Colors.grey[300]!,
+        shape: shapeBorder,
+      ),
+    ),
+  );
 }

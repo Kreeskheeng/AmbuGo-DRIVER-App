@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -91,12 +90,13 @@ class HomepageDriver extends GetView<HomepageDriverController> {
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await controller.onAmbulanceBooked(patientAssign, patient);
+      await _loadMarkerIcons();
       //await controller.initCurrentLocation(); // Initialize current location
     });
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    if (mapController.isCompleted) {
+    if (!mapController.isCompleted) {
       mapController.complete(controller);
     }
   }
@@ -136,10 +136,10 @@ class HomepageDriver extends GetView<HomepageDriverController> {
           isDraggable: false,
           controller: panelController,
           borderRadius: BorderRadius.circular(Dimensions.radius30),
-          panelBuilder: (controller) => PanelWidgetDriver(scrollController: ScrollController()),
+          panelBuilder: (controller) =>
+              PanelWidgetDriver(scrollController: ScrollController()),
           body: renderMap(),
-        ),
-        ),
+        )),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -171,7 +171,6 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                 //   'Activity',
                 //   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 //  ),
-
               ],
             ),
             SizedBox(width: 40), // Add more space between items
@@ -197,7 +196,6 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                 //   'My Account',
                 //   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 // ),
-
               ],
             ),
             SizedBox(width: 40), // Add space on the right side
@@ -238,6 +236,7 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                       },
                       markerId: const MarkerId('PatientLocation'),
                       position: controller.destinationLocation,
+                     // icon: _patientMarkerIcon, // Set patient marker icon
                     ),
                   Marker(
                     onTap: () {
@@ -248,6 +247,7 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                       controller.currentLocation!.latitude!,
                       controller.currentLocation!.longitude!,
                     ),
+                    //icon: _driverMarkerIcon, // Set driver marker icon
                   ),
                 },
                 polylines: {
@@ -278,7 +278,11 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                 ),
                 child: Center(
                   child: BigText(
-                    text: 'Key: ' + SPController().getUserId().toString().substring(0, 6),
+                    text: 'Key: ' +
+                        SPController()
+                            .getUserId()
+                            .toString()
+                            .substring(0, 6),
                     size: Dimensions.font20 * 0.8,
                     color: AppColors.white,
                   ),
@@ -287,7 +291,8 @@ class HomepageDriver extends GetView<HomepageDriverController> {
               SizedBox(height: 20),
               Button(
                 on_pressed: () {},
-                text: '  Estimated Arrival: ${controller.time}',
+                text:
+                '  Estimated Arrival: ${controller.time}',
                 color: AppColors.black,
                 textColor: AppColors.white,
                 width: Dimensions.width40 * 5,
@@ -300,5 +305,20 @@ class HomepageDriver extends GetView<HomepageDriverController> {
             : const SizedBox(),
       ],
     ));
+  }
+
+  BitmapDescriptor _driverMarkerIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor _patientMarkerIcon = BitmapDescriptor.defaultMarker;
+
+  Future<void> _loadMarkerIcons() async {
+    _driverMarkerIcon = await _loadMarkerIcon('assets/images/ambulance_icon.png');
+    _patientMarkerIcon = await _loadMarkerIcon('assets/images/pin.png');
+  }
+
+  Future<BitmapDescriptor> _loadMarkerIcon(String asset) async {
+    return await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.5),
+      asset,
+    );
   }
 }

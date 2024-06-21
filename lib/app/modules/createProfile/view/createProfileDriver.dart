@@ -24,6 +24,8 @@ class TransparentAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   });
 
+
+
   @override
   Size get preferredSize => Size.fromHeight(56.0);
 
@@ -241,7 +243,7 @@ class CreateProfileDriver extends GetView<CreateProfileDriverController> {
                       radius: Dimensions.radius20 * 2,
                       on_pressed: () {
                         controller.onCreateProfile();
-                        
+
                       },
                       text: 'CONTINUE',
                       color: AppColors.pink,

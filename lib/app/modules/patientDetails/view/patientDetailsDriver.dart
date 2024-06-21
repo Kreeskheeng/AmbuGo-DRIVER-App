@@ -35,6 +35,15 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                    child: Image.asset(
+                      'assets/images/ambugo.jpg',
+                      height: 70, // Increased height
+                      width: 70,  // Increased width
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                   Container(
                     width: Dimensions.width20 * 4,
                     height: Dimensions.height10 / 5,
@@ -48,8 +57,9 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                   ),
                   BigText(
                     text: 'Patient Details',
-                    size: Dimensions.font20 * 1.3,
+                    size: Dimensions.font20 * 1.5,
                     fontWeight: FontWeight.w600,
+                    color: Colors.lightGreen[900],
                   ),
                   SizedBox(
                     height: Dimensions.height20 * 1.8,
@@ -88,10 +98,12 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 text: 'Name:  ',
                                 size: Dimensions.font20,
                                 color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
                               BigText(
                                 text: patient['name'],
                                 size: Dimensions.font15 * 1.2,
+                                fontWeight: FontWeight.bold,
                               ),
                             ],
                           ),
@@ -108,19 +120,25 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                     // color: Colors.black, // Customize the color as needed
                                     // size: Dimensions.font15 * 1.2,
                                    // ),
-                                  SizedBox(width: Dimensions.width5), // Add some spacing between the icon and the text
+                                  //SizedBox(width: Dimensions.width5), // Add some spacing between the icon and the text
                                   BigText(
-                                    text: 'Phone number:  ',
+                                    text: 'Contact:  ',
                                     size: Dimensions.font20,
                                     color: const Color(0xFFFF0000),
+                                    fontWeight: FontWeight.bold,
                                   ),
+
+                                  BigText(
+                                    text: patient['phone'].toString(),
+                                    size: Dimensions.font15 * 1.2,
+                                    fontWeight: FontWeight.bold,
+
+                                  ),
+
                                 ],
-                              ),
-                              BigText(
-                                text: patient['phone'].toString(),
-                                size: Dimensions.font15 * 1.2,
 
                               ),
+
                             ],
                           ),
 
@@ -130,16 +148,59 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                           Row(
                             children: [
                               BigText(
-                                text: 'UserID:  ',
+                                text: 'Call:',
                                 size: Dimensions.font20,
                                 color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
-                              BigText(
-                                text: patient['user Id'],
-                                size: Dimensions.font15 * 1.2,
+                              SizedBox(width: Dimensions.width20*3),
+                              GestureDetector(
+                                onTap: () {
+
+                                },
+                                child: Image.asset(
+                                  'assets/images/call.png', // Replace with your image asset path
+                                  height: Dimensions.font20 * 2.5, // Adjust size as needed
+                                  width: Dimensions.font20 * 3.5, // Adjust size as needed
+                                ),
                               ),
                             ],
                           ),
+                          SizedBox(
+                            height: Dimensions.height15,
+                          ),
+
+                          Row(
+                            children: [
+                              BigText(
+                                text: 'Text:  ',
+                                size: Dimensions.font20,
+                                color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Type your message...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  maxLines: null, // Allows multiple lines of input
+                                  keyboardType: TextInputType.multiline,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: () {
+                                  // Implement send functionality
+                                  print('Sending message...');
+                                },
+                              ),
+                            ],
+                          ),
+
                         ],
                       );
                     },
@@ -158,8 +219,9 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                   ),
                   BigText(
                     text: 'Additional Data',
-                    size: Dimensions.font20 * 1.3,
+                    size: Dimensions.font20 * 1.5,
                     fontWeight: FontWeight.w600,
+                    color: Colors.lightGreen[900],
                   ),
                   SizedBox(
                     height: Dimensions.height20 * 1.8,
@@ -196,6 +258,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 text: 'EMERGENCY TYPE: ',
                                 color: const Color(0xFFFF0000),
                                 size: Dimensions.font20,
+                                fontWeight: FontWeight.bold,
                               ),
                               SizedBox(
                                 width: Dimensions.width15,
@@ -218,6 +281,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 text: 'Hosp. TYPE: ',
                                 color: const Color(0xFFFF0000),
                                 size: Dimensions.font20,
+                                fontWeight: FontWeight.bold,
                               ),
                               SizedBox(
                                 width: Dimensions.width15,
@@ -240,6 +304,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 text: 'PREFERRED Hosp.: ',
                                 color: const Color(0xFFFF0000),
                                 size: Dimensions.font20,
+                                fontWeight: FontWeight.bold,
                               ),
                               SizedBox(
                                 width: Dimensions.width15,
@@ -263,6 +328,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 text: 'OXYGEN NEED: ',
                                 color: const Color(0xFFFF0000),
                                 size: Dimensions.font20,
+                                fontWeight: FontWeight.bold,
                               ),
                               SizedBox(
                                 width: Dimensions.width15,
@@ -288,84 +354,84 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                     },
                   ),
 
-                  Button(
-                    on_pressed: () async {
-                      final CollectionReference hospitalsCollection =
-                      FirebaseFirestore.instance.collection('bookings');
+                  //Button(
+                    //on_pressed: () async {
+                    //  final CollectionReference hospitalsCollection =
+                     // FirebaseFirestore.instance.collection('bookings');
 
-                      const String apiKey =
-                          'AIzaSyBu60-4S559TmDx6ky9KTJ5Pl2VD0qQ4O8';
+                     // const String apiKey =
+                      //    'AIzaSyBtFdD1MNJWvqevGFtv5KgpHcgQXBusi4E';
 
-                      const int radius = 5000000;
-                      const double latitude = 0.3341163;
-                      const double longitude = 32.5638838;
+                     // const int radius = 5000000;
+                     // const double latitude = 0.3341163;
+                     // const double longitude = 32.5638838;
 
-                      const String url =
-                          'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=$radius&type=hospital&key=$apiKey';
+                     // const String url =
+                       //   'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=$radius&type=hospital&key=$apiKey';
 
-                      try {
-                        var response = await http.get(Uri.parse(url));
+                     // try {
+                      //  var response = await http.get(Uri.parse(url));
 
-                        if (response.statusCode == 200) {
-                          var json = jsonDecode(response.body);
+                       // if (response.statusCode == 200) {
+                       //   var json = jsonDecode(response.body);
 
                           // Check if the response contains results
-                          if (json.containsKey('results') &&
-                              json['results'].isNotEmpty) {
+                         // if (json.containsKey('results') &&
+                           //   json['results'].isNotEmpty) {
                             // Process the hospital data here
-                            List<dynamic> hospitals = json['results'];
+                          //  List<dynamic> hospitals = json['results'];
 
-                            Future<void> saveHospitalToFirestore(
-                                String placeId,
-                                String name,
-                                String vicinity,
-                                ) async {
-                              try {
-                                await hospitalsCollection
-                                    .doc(SPController().getUserId())
-                                    .update({
-                                  'nearest hospital': {
-                                    'name': name,
-                                    'vicinity': vicinity,
-                                  },
-                                });
+                          //  Future<void> saveHospitalToFirestore(
+                          //      String placeId,
+                          //      String name,
+                           //     String vicinity,
+                           //     ) async {
+                           //   try {
+                            //    await hospitalsCollection
+                              //      .doc(SPController().getUserId())
+                              //      .update({
+                              //    'nearest hospital': {
+                              //      'name': name,
+                              //      'vicinity': vicinity,
+                              //    },
+                             //   });
 
-                                print(
-                                    'Hospital data saved to Firestore: $name');
-                              } catch (e) {
-                                print('Error saving hospital data: $e');
-                              }
-                            }
+                              //  print(
+                             //       'Hospital data saved to Firestore: $name');
+                            //  } catch (e) {
+                             //   print('Error saving hospital data: $e');
+                           //   }
+                           // }
 
-                            for (var hospital in hospitals) {
-                              var placeId = hospital['place_id'] as String;
-                              var name = hospital['name'] as String;
-                              var vicinity = hospital['vicinity'] as String;
+                           // for (var hospital in hospitals) {
+                           //   var placeId = hospital['place_id'] as String;
+                           //   var name = hospital['name'] as String;
+                           //   var vicinity = hospital['vicinity'] as String;
 
-                              await saveHospitalToFirestore(
-                                  placeId, name, vicinity);
+                            //  await saveHospitalToFirestore(
+                            //      placeId, name, vicinity);
 
-                              print(
-                                  'Hospital: $name, Place ID: $placeId, Vicinity: $vicinity');
-                            }
-                          } else {
-                            print('No hospitals found.');
-                          }
-                        } else {
-                          print('Failed to fetch data: ${response.statusCode}');
-                        }
-                      } catch (e) {
-                        print('Error: $e');
-                      }
-                    },
-                    height: Dimensions.height40 * 1.4,
-                    width: Dimensions.width40 * 5,
-                    text: "Nearest hosp.",
-                    textColor: AppColors.pink,
-                    boxBorder: Border.all(width: 2, color: AppColors.pink),
-                    color: Colors.transparent,
-                    radius: Dimensions.radius30,
-                  ),
+                            //  print(
+                            //      'Hospital: $name, Place ID: $placeId, Vicinity: $vicinity');
+                          //  }
+                          //} else {
+                         //   print('No hospitals found.');
+                        //  }
+                        //} else {
+                        //  print('Failed to fetch data: ${response.statusCode}');
+                      //  }
+                      //} catch (e) {
+                      //  print('Error: $e');
+                     // }
+                   // },
+                    //height: Dimensions.height40 * 1.4,
+                 //   width: Dimensions.width40 * 5,
+                   // text: "Nearest hosp.",
+                   // textColor: AppColors.pink,
+                   // boxBorder: Border.all(width: 2, color: AppColors.pink),
+                   // color: Colors.transparent,
+                  //  radius: Dimensions.radius30,
+                 // ),
 
 
 
@@ -376,71 +442,8 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                     height: 30,
                   ),
 
-                  Button(
-                    on_pressed: ()  {Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QRGenerator(),
-                    ));},
-                    height: Dimensions.height40 * 1.4,
-                    width: Dimensions.width40 * 5,
-                    text: "Generate QrCode.",
-                    textColor: AppColors.pink,
-                    boxBorder: Border.all(width: 2, color: AppColors.pink),
-                    color: Colors.transparent,
-                    radius: Dimensions.radius30,
-                  ),
 
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: BigText(
-                              text: 'Nearest Hospital',
-                              fontWeight: FontWeight.w500,
-                              size: Dimensions.font26 * 0.8,
-                            ),
-                          ),
-                          SizedBox(
-                            height: Dimensions.height10,
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: Dimensions.width10,
-                                    top: Dimensions.height10 / 2),
-                                child: CircleAvatar(
-                                  radius: Dimensions.radius20,
-                                  backgroundImage: const NetworkImage(
-                                      'https://i.pinimg.com/originals/90/07/f5/9007f5b83b93ebda87bab0764735a1d5.png'),
-                                ),
-                              ),
-                              SizedBox(
-                                width: Dimensions.width10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BigText(
-                                    text: 'Mulago Hospital',
-                                    size: Dimensions.font20,
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: Dimensions.height10,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
 
                   Button(
                     on_pressed: () async {
