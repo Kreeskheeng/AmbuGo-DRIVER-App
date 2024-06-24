@@ -279,8 +279,7 @@ class HomepageDriver extends GetView<HomepageDriverController> {
                 child: Center(
                   child: BigText(
                     text: 'Key: ' +
-                        SPController()
-                            .getUserId()
+                        controller.bookedPatientId
                             .toString()
                             .substring(0, 6),
                     size: Dimensions.font20 * 0.8,

@@ -23,6 +23,16 @@ class PatientDetailsStaff extends StatelessWidget {
           Dimensions.width15, Dimensions.height30),
       child: Column(
         children: [
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.0), // Rounded corners
+            child: Image.asset(
+              'assets/images/ambugo.jpg',
+              height: 70, // Increased height
+              width: 70,  // Increased width
+              fit: BoxFit.cover,
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
@@ -61,8 +71,9 @@ class PatientDetailsStaff extends StatelessWidget {
                         SizedBox(height: Dimensions.height15),
                         BigText(
                           text: 'Patient Details',
-                          size: Dimensions.font20 * 1.3,
+                          size: Dimensions.font20 * 1.5,
                           fontWeight: FontWeight.w600,
+                          color: Colors.lightGreen[900],
                         ),
                         SizedBox(height: Dimensions.height20 * 1.5),
                         Button(
@@ -81,11 +92,14 @@ class PatientDetailsStaff extends StatelessWidget {
                             children: [
                               BigText(
                                 text: 'Name  ',
-                                size: Dimensions.font15 * 1.2,
+                                size: Dimensions.font20,
+                                color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
                               BigText(
                                 text: patient['name'] ?? 'N/A',
                                 size: Dimensions.font15 * 1.2,
+                                fontWeight: FontWeight.bold,
                               )
                             ],
                           ),
@@ -95,11 +109,14 @@ class PatientDetailsStaff extends StatelessWidget {
                             children: [
                               BigText(
                                 text: 'Phone number  ',
-                                size: Dimensions.font15 * 1.2,
+                                size: Dimensions.font20,
+                                color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
                               BigText(
                                 text: patient['phone']?.toString() ?? 'N/A',
                                 size: Dimensions.font15 * 1.2,
+                                fontWeight: FontWeight.bold,
                               ),
                             ],
                           ),
@@ -108,12 +125,17 @@ class PatientDetailsStaff extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               BigText(
-                                text: 'User Id  ',
-                                size: Dimensions.font15 * 1.2,
+                                text: 'Contact:  ',
+                                size: Dimensions.font20,
+                                color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
+
                               BigText(
-                                text: patient['user Id'] ?? 'N/A',
+                                text: patient['phone'].toString(),
                                 size: Dimensions.font15 * 1.2,
+                                fontWeight: FontWeight.bold,
+
                               ),
                             ],
                           ),

@@ -1,21 +1,21 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
-import 'package:last_minute_driver/app/modules/qr/HomePage.dart';
 import 'package:last_minute_driver/app/modules/qr/QR%20Generator/QRGenerator.dart';
-import 'package:last_minute_driver/widgets/button.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../helper/shared_preference.dart';
-import '../../../../utils/colors.dart';
-import '../../../../utils/dimensions.dart';
-import '../../../../widgets/big_text.dart';
-import '../../homePage/controller/homePageDriverController.dart';
-import '../controller/patientDriverController.dart';
 import 'package:http/http.dart' as http;
+import 'package:last_minute_driver/widgets/button.dart';
+import 'package:last_minute_driver/utils/colors.dart';
+import 'package:last_minute_driver/utils/dimensions.dart';
+import 'package:last_minute_driver/widgets/big_text.dart';
+import 'package:last_minute_driver/helper/shared_preference.dart';
+import '../../homePage/controller/homePageDriverController.dart';
+import '../../qr/QR Generator/GeneratedQR.dart';
+import '../controller/patientDriverController.dart';
 
 class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
   HomepageDriverController homepageController = Get.find();
@@ -29,7 +29,32 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
       await launch(url);
     } else {
       // Handle error: unable to launch the phone call.
+    }
+  }
 
+  final _rideFare = ''.obs; // Store the ride fare
+
+  @override
+  void initState() {
+    initState();
+    // Retrieve the ride fare from Firebase when the widget is initialized
+    retrieveRideFare();
+  }
+
+  // Retrieve the ride fare from Firebase
+  void retrieveRideFare() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> rideInfoDoc =
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(SPController().getUserId())
+          .get();
+      String rideFare = rideInfoDoc['rideFare'].toString(); // Change the field name as per your Firestore structure
+      print('Retrieved ride fare: $rideFare');
+
+      _rideFare(rideFare);
+    } catch (e) {
+      print('Error retrieving ride fare: $e');
     }
   }
 
@@ -85,25 +110,24 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                           if (user['userId'] == patientId && user['ambulanceStatus'] == 'assigned') {
                             // Ensure location data is not null
                             if (user['location'] != null && user['location']['lat'] != null && user['location']['lng'] != null) {
-                             // print('Calling onGetPatientLocation with lat: ${user['location']['lat']}, lng: ${user['location']['lng']}');
+                              // print('Calling onGetPatientLocation with lat: ${user['location']['lat']}, lng: ${user['location']['lng']}');
                               homepageController.onGetPatientLocation(user['location']['lat'], user['location']['lng']);
                               if (homepageController.document != null) {
                                 patient = homepageController.document!;
                               }
                             } else {
-
+                              // Handle null location data
                             }
                           }
                         }
                       } else {
-
+                        // Handle loading state
                       }
                       return patient == null
                           ? const Text('Loading')
                           : Column(
                         children: [
                           Row(
-
                             children: [
                               BigText(
                                 text: 'Name:  ',
@@ -122,37 +146,20 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                             height: Dimensions.height15,
                           ),
                           Row(
-
                             children: [
-                              Row(
-                                children: [
-                                   //Icon(
-                                    // Icons.phone,
-                                    // color: Colors.black, // Customize the color as needed
-                                    // size: Dimensions.font15 * 1.2,
-                                   // ),
-                                  //SizedBox(width: Dimensions.width5), // Add some spacing between the icon and the text
-                                  BigText(
-                                    text: 'Contact:  ',
-                                    size: Dimensions.font20,
-                                    color: const Color(0xFFFF0000),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-
-                                  BigText(
-                                    text: patient['phone'].toString(),
-                                    size: Dimensions.font15 * 1.2,
-                                    fontWeight: FontWeight.bold,
-
-                                  ),
-
-                                ],
-
+                              BigText(
+                                text: 'Contact:  ',
+                                size: Dimensions.font20,
+                                color: const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
                               ),
-
+                              BigText(
+                                text: patient['phone'].toString(),
+                                size: Dimensions.font15 * 1.2,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ],
                           ),
-
                           SizedBox(
                             height: Dimensions.height15,
                           ),
@@ -164,11 +171,10 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                                 color: const Color(0xFFFF0000),
                                 fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(width: Dimensions.width20*3),
+                              SizedBox(width: Dimensions.width20 * 3),
                               GestureDetector(
                                 onTap: () {
                                   _launchPhoneCall(patient?['phone']);
-
                                 },
                                 child: Image.asset(
                                   'assets/images/call.png', // Replace with your image asset path
@@ -181,7 +187,6 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                           SizedBox(
                             height: Dimensions.height15,
                           ),
-
                           Row(
                             children: [
                               BigText(
@@ -212,7 +217,6 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                               ),
                             ],
                           ),
-
                         ],
                       );
                     },
@@ -220,7 +224,6 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                   SizedBox(
                     height: Dimensions.height20 * 1.8,
                   ),
-
                   const Divider(
                     thickness: 1,
                     color: AppColors.lightGrey,
@@ -254,13 +257,10 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
 
                       final preferredHospital = additionalData['preferredHospital'] as String? ?? 'Preferred Hospital Not Set Yet!';
                       final oxygenNeed = additionalData['Is Oxygen neeeded'] as String? ?? 'Oxygen Need Not Set Yet!';
-                      final emergencyTypeList = additionalData['emergencyType'] as List<dynamic>? ??  [];
+                      final emergencyTypeList = additionalData['emergencyType'] as List<dynamic>? ?? [];
                       final hospitalType = additionalData['hospitalType'] as String? ?? 'Hospital Type Not Set Yet!';
 
                       final emergencyTypeText = emergencyTypeList.isNotEmpty ? emergencyTypeList.join(', ') : 'Emergency Type Not Set Yet!';
-
-
-
 
                       return Column(
                         children: [
@@ -301,7 +301,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                               Expanded(
                                 child: BigText(
                                   maxLines: null,
-                                  text:hospitalType,
+                                  text: hospitalType,
                                   size: Dimensions.font20,
                                 ),
                               ),
@@ -330,7 +330,6 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                               ),
                             ],
                           ),
-
                           SizedBox(
                             height: Dimensions.height10,
                           ),
@@ -357,106 +356,15 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                           SizedBox(
                             height: Dimensions.height20 * 1.8,
                           ),
-
-
-
-                          // Additional Rows or Widgets can be added here for other data
                         ],
                       );
                     },
                   ),
-
-                  //Button(
-                    //on_pressed: () async {
-                    //  final CollectionReference hospitalsCollection =
-                     // FirebaseFirestore.instance.collection('bookings');
-
-                     // const String apiKey =
-                      //    'AIzaSyBtFdD1MNJWvqevGFtv5KgpHcgQXBusi4E';
-
-                     // const int radius = 5000000;
-                     // const double latitude = 0.3341163;
-                     // const double longitude = 32.5638838;
-
-                     // const String url =
-                       //   'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=$radius&type=hospital&key=$apiKey';
-
-                     // try {
-                      //  var response = await http.get(Uri.parse(url));
-
-                       // if (response.statusCode == 200) {
-                       //   var json = jsonDecode(response.body);
-
-                          // Check if the response contains results
-                         // if (json.containsKey('results') &&
-                           //   json['results'].isNotEmpty) {
-                            // Process the hospital data here
-                          //  List<dynamic> hospitals = json['results'];
-
-                          //  Future<void> saveHospitalToFirestore(
-                          //      String placeId,
-                          //      String name,
-                           //     String vicinity,
-                           //     ) async {
-                           //   try {
-                            //    await hospitalsCollection
-                              //      .doc(SPController().getUserId())
-                              //      .update({
-                              //    'nearest hospital': {
-                              //      'name': name,
-                              //      'vicinity': vicinity,
-                              //    },
-                             //   });
-
-                              //  print(
-                             //       'Hospital data saved to Firestore: $name');
-                            //  } catch (e) {
-                             //   print('Error saving hospital data: $e');
-                           //   }
-                           // }
-
-                           // for (var hospital in hospitals) {
-                           //   var placeId = hospital['place_id'] as String;
-                           //   var name = hospital['name'] as String;
-                           //   var vicinity = hospital['vicinity'] as String;
-
-                            //  await saveHospitalToFirestore(
-                            //      placeId, name, vicinity);
-
-                            //  print(
-                            //      'Hospital: $name, Place ID: $placeId, Vicinity: $vicinity');
-                          //  }
-                          //} else {
-                         //   print('No hospitals found.');
-                        //  }
-                        //} else {
-                        //  print('Failed to fetch data: ${response.statusCode}');
-                      //  }
-                      //} catch (e) {
-                      //  print('Error: $e');
-                     // }
-                   // },
-                    //height: Dimensions.height40 * 1.4,
-                 //   width: Dimensions.width40 * 5,
-                   // text: "Nearest hosp.",
-                   // textColor: AppColors.pink,
-                   // boxBorder: Border.all(width: 2, color: AppColors.pink),
-                   // color: Colors.transparent,
-                  //  radius: Dimensions.radius30,
-                 // ),
-
-
-
-
                   const Divider(
                     thickness: 1,
                     color: AppColors.lightGrey,
                     height: 30,
                   ),
-
-
-
-
                   Button(
                     on_pressed: () async {
                       // Update ambulance status and perform necessary actions
@@ -465,42 +373,13 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                       });
                       homepageController.onAmbulanceBooked(false, '');
 
-                      // QR Code Scanning
-                      try {
-                        final qrCode = await FlutterBarcodeScanner.scanBarcode(
-                          '#ff6666',
-                          'Cancel',
-                          true,
-                          ScanMode.QR,
-                        );
-
-                        if (qrCode == '-1') {
-                          // User canceled the scan.
-                          print('Scan canceled.');
-                        } else if (qrCode.isNotEmpty) {
-                          // QR code was successfully scanned.
-                          print('Scanned QR Code: $qrCode');
-
-                          // Save the scanned QR code result to Firestore
-                          await FirebaseFirestore.instance.collection('scanned_codes').add({
-                            'result': qrCode,
-                            'timestamp': FieldValue.serverTimestamp(),
-                          });
-
-                          // Navigate to the Stripe payment page (uncomment the code below if needed)
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => Wallet(), // Replace with your Stripe payment screen
-                          //   ),
-                          // );
-                        } else {
-                          // QR code scan failed.
-                          print('Failed to scan QR Code.');
-                        }
-                      } on PlatformException {
-                        print('Failed to scan QR Code.');
-                      }
+                      // Navigate to the QR code screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GeneratedQR(_rideFare.value),
+                        ),
+                      );
                     },
                     height: Dimensions.height40 * 1.3,
                     width: Dimensions.width40 * 6,
