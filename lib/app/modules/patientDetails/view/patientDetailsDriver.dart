@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:last_minute_driver/app/modules/qr/HomePage.dart';
 import 'package:last_minute_driver/app/modules/qr/QR%20Generator/QRGenerator.dart';
 import 'package:last_minute_driver/widgets/button.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../helper/shared_preference.dart';
 import '../../../../utils/colors.dart';
 import '../../../../utils/dimensions.dart';
@@ -21,6 +22,16 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
   ScrollController scrollController;
   String? patientId;
   PatientDetailsDriver({super.key, required this.scrollController, this.patientId = ''});
+
+  void _launchPhoneCall(String phoneNumber) async {
+    final url = 'tel:$phoneNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      // Handle error: unable to launch the phone call.
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,18 +85,18 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                           if (user['userId'] == patientId && user['ambulanceStatus'] == 'assigned') {
                             // Ensure location data is not null
                             if (user['location'] != null && user['location']['lat'] != null && user['location']['lng'] != null) {
-                              print('Calling onGetPatientLocation with lat: ${user['location']['lat']}, lng: ${user['location']['lng']}');
+                             // print('Calling onGetPatientLocation with lat: ${user['location']['lat']}, lng: ${user['location']['lng']}');
                               homepageController.onGetPatientLocation(user['location']['lat'], user['location']['lng']);
                               if (homepageController.document != null) {
                                 patient = homepageController.document!;
                               }
                             } else {
-                              print('User location data is missing or incomplete');
+
                             }
                           }
                         }
                       } else {
-                        print('Snapshot does not have data');
+
                       }
                       return patient == null
                           ? const Text('Loading')
@@ -156,6 +167,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                               SizedBox(width: Dimensions.width20*3),
                               GestureDetector(
                                 onTap: () {
+                                  _launchPhoneCall(patient?['phone']);
 
                                 },
                                 child: Image.asset(
