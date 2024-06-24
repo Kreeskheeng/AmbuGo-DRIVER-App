@@ -50,11 +50,10 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
           .doc(SPController().getUserId())
           .get();
       String rideFare = rideInfoDoc['rideFare'].toString(); // Change the field name as per your Firestore structure
-      print('Retrieved ride fare: $rideFare');
 
       _rideFare(rideFare);
     } catch (e) {
-      print('Error retrieving ride fare: $e');
+
     }
   }
 
@@ -370,6 +369,11 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                       // Update ambulance status and perform necessary actions
                       await FirebaseFirestore.instance.collection('bookings').doc(patientId).update({
                         'ambulanceStatus': 'completed',
+                      });
+                      
+                        // Clear the declinedDrivers array
+                      await FirebaseFirestore.instance.collection('bookings').doc(patientId).update({
+                        'declinedDrivers': [],
                       });
                       homepageController.onAmbulanceBooked(false, '');
 
