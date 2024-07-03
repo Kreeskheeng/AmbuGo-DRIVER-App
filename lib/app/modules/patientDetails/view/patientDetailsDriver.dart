@@ -370,7 +370,7 @@ class PatientDetailsDriver extends GetView<PatientDetailsDriverController> {
                       await FirebaseFirestore.instance.collection('bookings').doc(patientId).update({
                         'ambulanceStatus': 'completed',
                       });
-                      
+
                         // Clear the declinedDrivers array
                       await FirebaseFirestore.instance.collection('bookings').doc(patientId).update({
                         'declinedDrivers': [],
